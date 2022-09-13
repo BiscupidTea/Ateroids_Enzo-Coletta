@@ -12,5 +12,25 @@
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="menu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="menu.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>src\object</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
