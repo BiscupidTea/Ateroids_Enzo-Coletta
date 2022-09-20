@@ -9,27 +9,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="..\src\game.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="menu.cpp">
+    <ClCompile Include="..\src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
+    <ClCompile Include="..\src\menu.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="..\src\object\player.cpp">
       <Filter>src\object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="menu.h">
+    <ClInclude Include="..\src\game.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
+    <ClInclude Include="..\src\menu.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
+    <ClInclude Include="..\src\object\player.h">
       <Filter>src\object</Filter>
     </ClInclude>
   </ItemGroup>
