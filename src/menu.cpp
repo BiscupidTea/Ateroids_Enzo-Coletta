@@ -187,6 +187,5 @@ void DrawCredits()
 
 bool ExitButton()
 {
-
-
+	return true;
 }

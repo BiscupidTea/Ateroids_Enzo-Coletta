@@ -2,7 +2,7 @@
 
 int main()
 {
-	InitWindow(GetScreenWidth(), GetScreenHeight(), "Asteroids");
-	Menu();
+	InitWindow(1000, 900, "Asteroids");
+	Game();
 	return 0;
 }
