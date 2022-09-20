@@ -1,8 +1,8 @@
 #pragma once
+#include <iostream>
 #include "raylib.h"
 #include "raymath.h"
 #include "object/player.h"
-#include <iostream>
 
 using namespace std;
 

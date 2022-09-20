@@ -57,23 +57,25 @@ void PlayerMovement(PLAYER& P1)
 		P1.shipAccelerationY += normalizeDirectionY;
 	}
 
-	if (P1.shipAccelerationX > 400)
+	if (P1.shipAccelerationX > 600)
 	{
-		P1.shipAccelerationX = 400;
+		P1.shipAccelerationX = 600;
 	}
-	else if (P1.shipAccelerationX < -400)
+	else if (P1.shipAccelerationX < -600)
 	{
-		P1.shipAccelerationX = -400;
+		P1.shipAccelerationX = -600;
 	}
 
-	if (P1.shipAccelerationY > 400)
+	if (P1.shipAccelerationY > 600)
 	{
-		P1.shipAccelerationY = 400;
+		P1.shipAccelerationY = 600;
 	}
-	else if (P1.shipAccelerationY < -400)
+	else if (P1.shipAccelerationY < -600)
 	{
-		P1.shipAccelerationY = -400;
+		P1.shipAccelerationY = -600;
 	}
+
+	cout << P1.shipAccelerationX << " " << P1.shipAccelerationY << endl;
 
 		P1.ship.x = P1.ship.x + (P1.shipAccelerationX * GetFrameTime());
 		P1.ship.y = P1.ship.y + (P1.shipAccelerationY * GetFrameTime());
