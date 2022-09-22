@@ -4,20 +4,30 @@ void Game()
 {
 	PLAYER P1 = CreatePlayer();
 
-	while (!WindowShouldClose())
+	Texture2D ship_idle = LoadTexture("rec/Ship_idle (1).png");
+	Texture2D scope = LoadTexture("rec/scope.png");
+
+	HideCursor();
+	while (!WindowShouldClose() && P1.lives > 0)
 	{
 		PlayerWallColition(P1);
 		PlayerMovement(P1);
-		DrawGame(P1);
+		DrawGame(P1, ship_idle, scope);
 	}	
+	
 }
 
-void DrawGame(PLAYER P1)
+void DrawGame(PLAYER P1, Texture2D ship_idle, Texture2D scope)
 {
+	Rectangle sourceShip = { 0.0f, 0.0f, 40.0, 36.0 };
+	Rectangle destRec = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f, 40.0 * 2.0f, 36.0 * 2.0f };
+
 	BeginDrawing();
-	ClearBackground(BLACK);
+	ClearBackground(WHITE);
 	//player 
 	DrawRectanglePro(P1.ship, P1.origin, P1.rotation, P1.color);
+	DrawTexturePro(ship_idle, sourceShip, destRec, P1.origin, P1.rotation, WHITE);
+	DrawTexture(scope, GetMouseX()-19.5, GetMouseY()-19.5, WHITE);
 	DrawLine(P1.ship.x, P1.ship.y, GetMouseX(), GetMouseY(), DARKGRAY);
 
 	EndDrawing();
@@ -79,6 +89,15 @@ void PlayerMovement(PLAYER& P1)
 
 		P1.ship.x = P1.ship.x + (P1.shipAccelerationX * GetFrameTime());
 		P1.ship.y = P1.ship.y + (P1.shipAccelerationY * GetFrameTime());
+
+		P1.center.x = P1.ship.x + (P1.ship.width / 2);
+		P1.center.y = P1.ship.y + (P1.ship.height / 2);
+
+		P1.XY.x = P1.ship.x - 120;
+		P1.XY.y = P1.ship.y - 63;
+
+		P1.origin.x = (P1.ship.width / 2);
+		P1.origin.y = (P1.ship.height / 2);
 
 }
 

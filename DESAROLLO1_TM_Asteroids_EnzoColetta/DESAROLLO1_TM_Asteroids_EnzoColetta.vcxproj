@@ -22,11 +22,13 @@
     <ClCompile Include="..\src\game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\menu.cpp" />
+    <ClCompile Include="..\src\object\asteroid.cpp" />
     <ClCompile Include="..\src\object\player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\menu.h" />
+    <ClInclude Include="..\src\object\asteroid.h" />
     <ClInclude Include="..\src\object\player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
