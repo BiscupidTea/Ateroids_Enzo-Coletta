@@ -3,9 +3,11 @@
 
 struct ASTEROIDS
 {
-	Vector2 XY;
+	Vector2 center;
+	Vector2 speed;
 	float radius;
+	int rotation;
 	int tipe;
 };
 
-ASTEROIDS CreateAsteroids();
+ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid);

@@ -11,9 +11,8 @@ struct PLAYER
 	Color color;
 	int lives;
 	int score;
-	float shipAccelerationX;
-	float shipAccelerationY;
-
+	Vector2 shipAcceleration;
+	Vector2 speed;
 };
 
 PLAYER CreatePlayer();

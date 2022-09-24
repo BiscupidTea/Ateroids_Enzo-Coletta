@@ -22,7 +22,7 @@ void Menu()
 			do
 			{
 				DrawRules();
-			} while (ExitButton() == false);
+			} while (!ExitButton());
 			break;
 
 		case 3:
@@ -33,14 +33,14 @@ void Menu()
 				{
 					ToggleFullscreen();
 				}
-			} while (ExitButton() == false);
+			} while (!ExitButton());
 			break;
 
 		case 4:
 			do
 			{
 				DrawCredits();
-			} while (ExitButton() == false);
+			} while (!ExitButton());
 
 			break;
 

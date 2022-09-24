@@ -4,8 +4,8 @@ PLAYER CreatePlayer()
 {
 	PLAYER P1{};
 
-	P1.ship.width = 50;
-	P1.ship.height = 50;
+	P1.ship.width = 0;
+	P1.ship.height = 0;
 	P1.ship.x = static_cast<float>(GetScreenWidth()/2) - (P1.ship.width / 2);
 	P1.ship.y = static_cast<float>(GetScreenHeight()/2) - (P1.ship.height / 2);
 
@@ -24,8 +24,8 @@ PLAYER CreatePlayer()
 	P1.lives = 3;
 	P1.score = 0;
 
-	P1.shipAccelerationX = 0;
-	P1.shipAccelerationY = 0;
+	P1.shipAcceleration.x = 0;
+	P1.shipAcceleration.y = 0;
 
 	return P1;
 }
