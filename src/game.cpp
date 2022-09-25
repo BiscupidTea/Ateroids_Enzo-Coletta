@@ -5,15 +5,24 @@ void Game()
 	PLAYER P1 = CreatePlayer();
 	Texture2D ship_idle = LoadTexture("rec/textures/Ship_idle (1).png");
 	Texture2D scope = LoadTexture("rec/textures/scope.png");
+	const int amountAsteroids = 8;
+	ASTEROIDS arrayAsteroid[amountAsteroids];
 
-	ASTEROIDS arrayAsteroid[10];
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < amountAsteroids; i++)
 	{
 		CreateAsteroids(arrayAsteroid[i]);
 	}
 
-	bool pause = false;
+	const int maxAmmo = 20;
+	BULLETS arrayBulets[maxAmmo];
 
+	for (int i = 0; i < maxAmmo; i++)
+	{
+		CreateBullets(arrayBulets[i], P1);
+	}
+
+	bool pause = false;
+	int counterBullet = 0;
 	P1.ship.width = ship_idle.width;
 	P1.ship.height = ship_idle.height;
 
@@ -34,13 +43,16 @@ void Game()
 
 		if (pause == false)
 		{
+			PlayerF::BulletState(arrayBulets, maxAmmo, P1);
+			PlayerF::PlayerShoot(arrayBulets, counterBullet, P1, maxAmmo);
 			PlayerF::PlayerWallColition(P1);
 			PlayerF::PlayerMovement(P1);
-			AsteroidF::AsteroidMovement(arrayAsteroid);
-			AsteroidF::AsteroidWallColition(arrayAsteroid);
+			//PlayerF::PlayerAsteroidColision(P1, arrayAsteroid, amountAsteroids, ship_idle);
+			AsteroidF::AsteroidMovement(arrayAsteroid, amountAsteroids);
+			AsteroidF::AsteroidWallColition(arrayAsteroid, amountAsteroids);
 		}
 
-		DrawF::DrawGame(P1, ship_idle, scope, arrayAsteroid);
+		DrawF::DrawGame(P1, ship_idle, scope, arrayAsteroid, amountAsteroids, arrayBulets, maxAmmo);
 
 	}
 
@@ -49,7 +61,7 @@ void Game()
 namespace DrawF
 {
 
-	void DrawGame(PLAYER P1, Texture2D ship_idle, Texture2D scope, ASTEROIDS arrayAsteroid[])
+	void DrawGame(PLAYER P1, Texture2D ship_idle, Texture2D scope, ASTEROIDS arrayAsteroid[], int amountAsteroids, BULLETS arrayBulets[], int maxAmmo)
 	{
 		Rectangle sourceShip = { 0.0f, 0.0f, ship_idle.width, ship_idle.height };
 		Rectangle destRec = { P1.ship.x, P1.ship.y, ship_idle.width, ship_idle.height };
@@ -63,11 +75,24 @@ namespace DrawF
 			DrawCircle(arrayAsteroid[x].center.x, arrayAsteroid[x].center.y, arrayAsteroid[x].radius, WHITE);
 		}
 
+		//bulets
+		for (int i = 0; i < maxAmmo; i++)
+		{
+			if (arrayBulets[i].isShoted)
+			{
+				DrawCircle(arrayBulets[i].Pos.x, arrayBulets[i].Pos.y, arrayBulets[i].radius, RED);
+			}
+		}
+
 		//player 
-		//DrawCircle(P1.ship.x, P1.ship.y, (ship_idle.width / 2 + 2), RED);
 		DrawTexturePro(ship_idle, sourceShip, destRec, P1.origin, P1.rotation, WHITE);
 		DrawTexture(scope, GetMouseX() - 19.5, GetMouseY() - 19.5, WHITE);
-		DrawLine(P1.ship.x, P1.ship.y, GetMouseX(), GetMouseY(), DARKGRAY);
+
+		//draw extra info
+		//DrawCircle(P1.ship.x, P1.ship.y, (ship_idle.width / 2 + 2), RED);
+		//DrawLine(P1.ship.x, P1.ship.y, GetMouseX(), GetMouseY(), DARKGRAY);
+		//DrawCircle(P1.ship.x, P1.ship.y, 5, GREEN);
+
 
 		//score/lives/
 		DrawInfo(ship_idle, P1);
@@ -102,22 +127,26 @@ namespace DrawF
 
 	}
 
+	void DrawPause()
+	{
+
+	}
 }
 
 namespace AsteroidF
 {
-	void AsteroidMovement(ASTEROIDS arrayAsteroids[])
+	void AsteroidMovement(ASTEROIDS arrayAsteroids[], int amountAsteroids)
 	{
-		for (int x = 0; x < 10; x++)
+		for (int x = 0; x < amountAsteroids; x++)
 		{
 			arrayAsteroids[x].center.x += arrayAsteroids[x].speed.x * GetFrameTime();
 			arrayAsteroids[x].center.y += arrayAsteroids[x].speed.y * GetFrameTime();
 		}
 	}
 
-	void AsteroidWallColition(ASTEROIDS arrayAsteroids[])
+	void AsteroidWallColition(ASTEROIDS arrayAsteroids[], int amountAsteroids)
 	{
-		for (int x = 0; x < 10; x++)
+		for (int x = 0; x < amountAsteroids; x++)
 		{
 			if (arrayAsteroids[x].center.x > GetScreenWidth())
 			{
@@ -149,8 +178,8 @@ namespace PlayerF
 		float arcotan;
 		float angulo;
 
-		vectorDirection.x = GetMouseX() - (P1.ship.x);
-		vectorDirection.y = GetMouseY() - (P1.ship.y);
+		vectorDirection.x = GetMouseX() - P1.ship.x;
+		vectorDirection.y = GetMouseY() - P1.ship.y;
 		arcotan = atan(vectorDirection.y / vectorDirection.x);
 		angulo = arcotan * 180 / PI;
 
@@ -164,33 +193,33 @@ namespace PlayerF
 		//logic movement
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
-			normalizeDirection.x = vectorDirection.x / abs(vectorDirection.x);
-			normalizeDirection.y = vectorDirection.y / abs(vectorDirection.y);
+			normalizeDirection = Vector2Normalize(vectorDirection);
 
 			P1.shipAcceleration.x += normalizeDirection.x;
 			P1.shipAcceleration.y += normalizeDirection.y;
+			
 		}
 
-		if (P1.shipAcceleration.x > 400 && P1.shipAcceleration.x > 0)
+		
+		if (P1.shipAcceleration.x > 300 && P1.shipAcceleration.x > 0)
 		{
-			P1.shipAcceleration.x = 400;
+			P1.shipAcceleration.x = 300;
 		}
-		else if (P1.shipAcceleration.x < -400 && P1.shipAcceleration.x < 0)
+		else if (P1.shipAcceleration.x < -300 && P1.shipAcceleration.x < 0)
 		{
-			P1.shipAcceleration.x = -400;
-		}
-
-		if (P1.shipAcceleration.y > 400 && P1.shipAcceleration.y > 0)
-		{
-			P1.shipAcceleration.y = 400;
-		}
-		else if (P1.shipAcceleration.y < -400 && P1.shipAcceleration.y < 0)
-		{
-			P1.shipAcceleration.y = -400;
+			P1.shipAcceleration.x = -300;
 		}
 
-		cout << P1.shipAcceleration.x << " " << P1.shipAcceleration.y << endl;
-		cout << P1.speed.x << " " << P1.speed.y << endl;
+		if (P1.shipAcceleration.y > 300 && P1.shipAcceleration.y > 0)
+		{
+			P1.shipAcceleration.y = 300;
+		}
+		else if (P1.shipAcceleration.y < -300 && P1.shipAcceleration.y < 0)
+		{
+			P1.shipAcceleration.y = -300;
+		}
+		
+		//cout << P1.speed.x << " " << P1.speed.y << endl;
 
 		P1.speed.x = P1.shipAcceleration.x;
 		P1.speed.y = P1.shipAcceleration.y;
@@ -200,9 +229,6 @@ namespace PlayerF
 
 		P1.center.x = P1.ship.x + (P1.ship.width / 2);
 		P1.center.y = P1.ship.y + (P1.ship.height / 2);
-
-		P1.XY.x = P1.ship.x - 120;
-		P1.XY.y = P1.ship.y - 63;
 
 		P1.origin.x = (P1.ship.width / 2);
 		P1.origin.y = (P1.ship.height / 2);
@@ -230,8 +256,92 @@ namespace PlayerF
 		}
 	}
 
-	void PlayerShoot(PLAYER& P1)
+	void BulletState(BULLETS arrayBulets[], int maxAmmo, PLAYER& P1)
 	{
+		for (int i = 0; i < maxAmmo; i++)
+		{
+			if (arrayBulets[i].isShoted )
+			{
+				if (arrayBulets[i].Pos.x < 0 || arrayBulets[i].Pos.x > GetScreenWidth())
+				{
+					arrayBulets[i].isShoted = false;
+				}
+
+				else if (arrayBulets[i].Pos.y < 75 || arrayBulets[i].Pos.y > GetScreenHeight())
+				{
+					arrayBulets[i].isShoted = false;
+				}
+			}
+			else
+			{
+				arrayBulets[i].Pos.x = P1.ship.x;
+				arrayBulets[i].Pos.y = P1.ship.y;
+				arrayBulets[i].speed.x = 0;
+				arrayBulets[i].speed.y = 0;
+			}	
+			
+		}
+	}
+
+	void PlayerShoot(BULLETS arrayBulets[], int& counter, PLAYER& P1, int maxAmmo)
+	{
+		Vector2 vectorDirection;
+		Vector2 normalizeDirection;
+
+		vectorDirection.x = GetMouseX() - arrayBulets[counter].Pos.x;
+		vectorDirection.y = GetMouseY() - arrayBulets[counter].Pos.y;
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		{
+			counter++;
+			if (counter == maxAmmo)
+			{
+				counter = 0;
+			}
+
+			normalizeDirection = Vector2Normalize(vectorDirection);
+
+			arrayBulets[counter].speed.x += normalizeDirection.x;
+			arrayBulets[counter].speed.y += normalizeDirection.y;
+			arrayBulets[counter].speed.x *= 200;
+			arrayBulets[counter].speed.y *= 200;
+			arrayBulets[counter].isShoted = true;
+			cout << "shot " << counter << endl;
+			//cout << normalizeDirection.x << " " << normalizeDirection.y << endl;
+		}
 		
+		//cout << arrayBulets[counter-1].Pos.x << " " << arrayBulets[counter - 1].Pos.y << endl;
+
+		for (int i = 0; i < maxAmmo; i++)
+		{
+			if (arrayBulets[i].isShoted)
+			{
+				arrayBulets[i].Pos.x = arrayBulets[i].Pos.x + (arrayBulets[i].speed.x * GetFrameTime());
+				arrayBulets[i].Pos.y = arrayBulets[i].Pos.y + (arrayBulets[i].speed.y * GetFrameTime());
+				//cout << arrayBulets[i].Pos.x << " " << arrayBulets[i].Pos.y << endl;
+				//cout << arrayBulets[i].speed.x << " " << arrayBulets[i].speed.y << endl;
+			}
+		}
+
+	}
+
+	void PlayerAsteroidColision(PLAYER& P1, ASTEROIDS arrayAsteroids[], int amountAsteroids, Texture2D ship_idle)
+	{
+		for (int i = 0; i < amountAsteroids; i++)
+		{
+			float distX = P1.ship.x - arrayAsteroids[i].center.x;
+			float distY = P1.ship.y - arrayAsteroids[i].center.y;
+			float distance = sqrt((distX * distX) + (distY * distY));
+
+			if (distance <= (ship_idle.width / 2 + 2) + arrayAsteroids[i].radius)
+			{
+				P1.lives--;
+				P1.speed.x = 0;
+				P1.speed.y = 0;
+				P1.ship.x = GetScreenWidth()/2;
+				P1.ship.y = GetScreenHeight()/2;
+			}
+
+		}
 	}
 }

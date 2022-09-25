@@ -2,9 +2,23 @@
 
 ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid)
 {
+
+	asteroid.rotation = GetRandomValue(0, 359);
+	//asignar que tipo de asteroide es 
+	asteroid.tipe = 3;
+
+	//asignar el radio
+	if (asteroid.tipe == 3)
+	{
+		asteroid.radius = 50;
+	}
+	else
+	{
+		asteroid.radius = 25;
+	}
+
 	//asignar donde salen
-	asteroid.radius = 10;
-	if (GetRandomValue(1,2) == 1)
+	if (GetRandomValue(1, 2) == 1)
 	{
 		if (GetRandomValue(1, 2) == 1)
 		{
@@ -31,10 +45,16 @@ ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid)
 		asteroid.center.x = GetRandomValue(0, GetScreenWidth());
 	}
 
-	asteroid.tipe = 3;
-	asteroid.speed.x = GetRandomValue(-200, 200);
-	asteroid.speed.y = GetRandomValue(-200, 200);
-	asteroid.rotation = GetRandomValue(0, 359);
+	//asignar velocidad
+	do
+	{
+		asteroid.speed.x = GetRandomValue(-200, 200);
+	} while (asteroid.speed.x > -50 && asteroid.speed.x < 50);
+	
+	do
+	{
+		asteroid.speed.y = GetRandomValue(-200, 200);
+	} while (asteroid.speed.y > -50 && asteroid.speed.y < 50);
 
 	return asteroid;
 }

@@ -6,13 +6,22 @@ struct PLAYER
 	Rectangle ship;
 	Vector2 origin;
 	Vector2 center;
-	Vector2 XY;
 	float rotation;
 	Color color;
 	int lives;
 	int score;
 	Vector2 shipAcceleration;
 	Vector2 speed;
+
+};
+
+struct BULLETS
+{
+	Vector2 Pos;
+	Vector2 speed;
+	float radius;
+	bool isShoted;
 };
 
 PLAYER CreatePlayer();
+BULLETS CreateBullets(BULLETS& bulet, PLAYER P1);
