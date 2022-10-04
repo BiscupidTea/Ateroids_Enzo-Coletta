@@ -3,7 +3,6 @@
 PLAYER CreatePlayer()
 {
 	PLAYER P1{};
-
 	P1.ship.width = 0;
 	P1.ship.height = 0;
 	P1.ship.x = static_cast<float>(GetScreenWidth() / 2) - (P1.ship.width / 2);
@@ -27,7 +26,7 @@ PLAYER CreatePlayer()
 	return P1;
 }
 
-BULLETS CreateBullets(BULLETS& bulet, PLAYER P1)
+void CreateBullets(BULLETS& bulet, PLAYER P1)
 {
 	bulet.radius = 5;
 	bulet.isShoted = false;
@@ -35,6 +34,4 @@ BULLETS CreateBullets(BULLETS& bulet, PLAYER P1)
 	bulet.Pos.y = P1.center.y;
 	bulet.speed.x = 0;
 	bulet.speed.y = 0;
-
-	return bulet;
 }

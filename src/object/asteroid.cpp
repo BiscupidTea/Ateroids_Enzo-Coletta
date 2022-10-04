@@ -1,32 +1,22 @@
 #include "asteroid.h"
 
-ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid)
+void CreateAsteroidsBig(ASTEROID& asteroid)
 {
-
+	asteroid.size = Size::Big;
 	asteroid.rotation = GetRandomValue(0, 359);
-	//asignar que tipo de asteroide es 
-	asteroid.tipe = 3;
-
 	//asignar el radio
-	if (asteroid.tipe == 3)
-	{
-		asteroid.radius = 50;
-	}
-	else
-	{
-		asteroid.radius = 25;
-	}
+	asteroid.radius = 50;
 
 	//asignar donde salen
 	if (GetRandomValue(1, 2) == 1)
 	{
 		if (GetRandomValue(1, 2) == 1)
 		{
-			asteroid.center.x = GetScreenWidth() - 10;
+			asteroid.center.x = GetScreenWidth() - asteroid.radius;
 		}
 		else
 		{
-			asteroid.center.x = 10;
+			asteroid.center.x = 50 + asteroid.radius;
 		}
 
 		asteroid.center.y = GetRandomValue(0, GetScreenHeight());
@@ -35,11 +25,11 @@ ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid)
 	{
 		if (GetRandomValue(1, 2) == 1)
 		{
-			asteroid.center.y = GetScreenHeight() - 10;
+			asteroid.center.y = GetScreenHeight() - asteroid.radius;
 		}
 		else
 		{
-			asteroid.center.y = 10;
+			asteroid.center.y = 100 + asteroid.radius;
 		}
 
 		asteroid.center.x = GetRandomValue(0, GetScreenWidth());
@@ -48,13 +38,51 @@ ASTEROIDS CreateAsteroids(ASTEROIDS& asteroid)
 	//asignar velocidad
 	do
 	{
-		asteroid.speed.x = GetRandomValue(-200, 200);
+		asteroid.speed.x = GetRandomValue(-100, 100);
 	} while (asteroid.speed.x > -50 && asteroid.speed.x < 50);
 	
 	do
 	{
-		asteroid.speed.y = GetRandomValue(-200, 200);
-	} while (asteroid.speed.y > -50 && asteroid.speed.y < 50);
+		asteroid.speed.y = GetRandomValue(-100, 100);
+	} while (asteroid.speed.y < -50 && asteroid.speed.y < 50);
 
-	return asteroid;
+	asteroid.isDestroyed = false;
+}
+
+void CreateAsteroidsMedium(ASTEROID& asteroid)
+{
+	asteroid.size = Size::Medium;
+	asteroid.rotation = GetRandomValue(0, 359);
+	//asignar el radio
+	asteroid.radius = 15;
+
+	//asignar donde salen
+	asteroid.center.x = - 50;
+	asteroid.center.y = - 50;
+	
+
+	//asignar velocidad
+	asteroid.speed.x = 0;
+	asteroid.speed.y = 0;
+
+	asteroid.isDestroyed = false;
+}
+
+void CreateAsteroidsSmall(ASTEROID& asteroid)
+{	
+	asteroid.size = Size::Small;
+	asteroid.rotation = GetRandomValue(0, 359);
+	//asignar el radio
+	asteroid.radius = 10;
+
+	//asignar donde salen
+	asteroid.center.x = -50;
+	asteroid.center.y = -50;
+
+
+	//asignar velocidad
+	asteroid.speed.x = 0;
+	asteroid.speed.y = 0;
+
+	asteroid.isDestroyed = false;
 }

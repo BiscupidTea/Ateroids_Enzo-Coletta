@@ -19,9 +19,10 @@ struct BULLETS
 {
 	Vector2 Pos;
 	Vector2 speed;
+	float rotation;
 	float radius;
 	bool isShoted;
 };
 
 PLAYER CreatePlayer();
-BULLETS CreateBullets(BULLETS& bulet, PLAYER P1);
+void CreateBullets(BULLETS& bulet, PLAYER P1);
