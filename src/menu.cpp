@@ -60,31 +60,31 @@ void Menu()
 
 void CreateOptions(RECOPTIONS& play, RECOPTIONS& rules, RECOPTIONS& options, RECOPTIONS& credits, RECOPTIONS& escape)
 {
-	play.rectangle.x = ((GetScreenWidth() / 2) - (200 / 2));
+	play.rectangle.x = static_cast<float>((GetScreenWidth() / 2) - (200 / 2));
 	play.rectangle.y = (200);
 	play.rectangle.height = 40;
 	play.rectangle.width = 200;
 	play.name = "play";
 
-	rules.rectangle.x = ((GetScreenWidth() / 2) - (200 / 2));
+	rules.rectangle.x = static_cast<float>((GetScreenWidth() / 2) - (200 / 2));
 	rules.rectangle.y = (300);
 	rules.rectangle.height = 40;
 	rules.rectangle.width = 200;
 	rules.name = "rules";
 
-	options.rectangle.x = ((GetScreenWidth() / 2) - (200 / 2));
+	options.rectangle.x = static_cast<float>((GetScreenWidth() / 2) - (200 / 2));
 	options.rectangle.y = (400);
 	options.rectangle.height = 40;
 	options.rectangle.width = 200;
 	options.name = "options";
 
-	credits.rectangle.x = ((GetScreenWidth() / 2) - (200 / 2));
+	credits.rectangle.x = static_cast<float>((GetScreenWidth() / 2) - (200 / 2));
 	credits.rectangle.y = (500);
 	credits.rectangle.height = 40;
 	credits.rectangle.width = 200;
 	credits.name = "credits";
 
-	escape.rectangle.x = ((GetScreenWidth() / 2) - (200 / 2));
+	escape.rectangle.x = static_cast<float>((GetScreenWidth() / 2) - (200 / 2));
 	escape.rectangle.y = (600);
 	escape.rectangle.height = 40;
 	escape.rectangle.width = 200;
@@ -93,6 +93,7 @@ void CreateOptions(RECOPTIONS& play, RECOPTIONS& rules, RECOPTIONS& options, REC
 
 int CheckInput(RECOPTIONS& play, RECOPTIONS& rules, RECOPTIONS& options, RECOPTIONS& credits, RECOPTIONS& escape)
 {
+
 	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 	{
 		if (PointRectangleColision(play.rectangle.x, play.rectangle.y, play.rectangle.width, play.rectangle.height))
@@ -116,6 +117,7 @@ int CheckInput(RECOPTIONS& play, RECOPTIONS& rules, RECOPTIONS& options, RECOPTI
 			return 5;
 		}
 	}
+	return 6;
 }
 
 bool PointRectangleColision(float& x, float& y, float& w, float& h)

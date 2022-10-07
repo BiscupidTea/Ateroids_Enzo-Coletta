@@ -19,7 +19,7 @@ void CreateAsteroidsBig(ASTEROID& asteroid)
 			asteroid.center.x = 50 + asteroid.radius;
 		}
 
-		asteroid.center.y = GetRandomValue(0, GetScreenHeight());
+		asteroid.center.y = static_cast<float>(GetRandomValue(0, GetScreenHeight()));
 	}
 	else
 	{
@@ -32,18 +32,18 @@ void CreateAsteroidsBig(ASTEROID& asteroid)
 			asteroid.center.y = 100 + asteroid.radius;
 		}
 
-		asteroid.center.x = GetRandomValue(0, GetScreenWidth());
+		asteroid.center.x = static_cast<float>(GetRandomValue(0, GetScreenWidth()));
 	}
 
 	//asignar velocidad
 	do
 	{
-		asteroid.speed.x = GetRandomValue(-100, 100);
+		asteroid.speed.x = static_cast<float>(GetRandomValue(-100, 100));
 	} while (asteroid.speed.x > -50 && asteroid.speed.x < 50);
 	
 	do
 	{
-		asteroid.speed.y = GetRandomValue(-100, 100);
+		asteroid.speed.y = static_cast<float>(GetRandomValue(-100, 100));
 	} while (asteroid.speed.y < -50 && asteroid.speed.y < 50);
 
 	asteroid.isDestroyed = false;
@@ -65,7 +65,7 @@ void CreateAsteroidsMedium(ASTEROID& asteroid)
 	asteroid.speed.x = 0;
 	asteroid.speed.y = 0;
 
-	asteroid.isDestroyed = false;
+	asteroid.isDestroyed = true;
 }
 
 void CreateAsteroidsSmall(ASTEROID& asteroid)
@@ -84,5 +84,5 @@ void CreateAsteroidsSmall(ASTEROID& asteroid)
 	asteroid.speed.x = 0;
 	asteroid.speed.y = 0;
 
-	asteroid.isDestroyed = false;
+	asteroid.isDestroyed = true;
 }

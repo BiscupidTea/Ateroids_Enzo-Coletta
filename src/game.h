@@ -19,9 +19,6 @@ namespace DrawF
 		BULLETS arrayBulets[],
 		int maxAmmo,
 		ASTEROID arrayAsteroid[],
-		int amountAsteroidsBig,
-		int amountAsteroidsMedium,
-		int amountAsteroidsSmall,
 		int maxAsteroids
 	);
 
@@ -60,7 +57,6 @@ namespace PlayerF
 		ASTEROID arrayAsteroid[],
 		int amountAsteroidsBig,
 		int amountAsteroidsMedium,
-		int amountAsteroidsSmall,
 		int& counterMidAsteroid,
 		int& counterSmallAsteroid,
 		int maxAsteroids
@@ -70,7 +66,6 @@ namespace PlayerF
 		ASTEROID arrayAsteroid[],
 		int amountAsteroidsBig,
 		int amountAsteroidsMedium,
-		int amountAsteroidsSmall,
 		BULLETS arrayBulets[],
 		int maxAmmo,
 		PLAYER& P1,
@@ -84,17 +79,11 @@ namespace AsteroidF
 {
 	void AsteroidMovement(
 		ASTEROID arrayAsteroid[],
-		int amountAsteroidsBig, 
-		int amountAsteroidsMedium, 
-		int amountAsteroidsSmall,
 		int maxAsteroids
 	);
 
 	void AsteroidWallColition(
 		ASTEROID arrayAsteroid[],
-		int amountAsteroidsBig,
-		int amountAsteroidsMedium,
-		int amountAsteroidsSmall,
 		int maxAsteroids
 	);
 
@@ -102,7 +91,6 @@ namespace AsteroidF
 		ASTEROID arrayAsteroid[],
 		int amountAsteroidsBig,
 		int amountAsteroidsMedium,
-		int amountAsteroidsSmall,
 		int& counterMidAsteroid,
 		int& counterSmallAsteroid,
 		int maxAsteroids
