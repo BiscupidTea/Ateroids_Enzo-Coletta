@@ -2,20 +2,37 @@
 
 void Menu()
 {
+	extern Texture2D ship_idle;
+	extern Texture2D scope;
+	extern Texture2D AsteroidTipe_1;
+	extern Sound shot1;
+
+	ship_idle = LoadTexture("res/textures/Ship_idle (1).png");
+	scope = LoadTexture("res/textures/scope.png");
+	AsteroidTipe_1 = LoadTexture("res/textures/asteroid_1.png");
+	shot1 = LoadSound("res/sounds/Shot1.wav");
+
 	RECOPTIONS play;
 	RECOPTIONS rules;
 	RECOPTIONS options;
 	RECOPTIONS credits;
 	RECOPTIONS escape;
-	bool closeGame = false;
+	bool closeGame;
+	float SFXvolume = 0.5f;
+	float MusicVolume = 0.5f;
+
 	CreateOptions(play, rules, options, credits, escape);
-	do
+	closeGame = false;
+
+	while (closeGame == false)
 	{
+		ShowCursor();
 		DrawMenu(play, rules, options, credits, escape);
 		switch (CheckInput(play, rules, options, credits, escape))
 		{
 		case 1:
-			Game();
+			closeGame = true;
+			Game(closeGame, SFXvolume, MusicVolume);
 			break;
 
 		case 2:
@@ -41,9 +58,7 @@ void Menu()
 			{
 				DrawCredits();
 			} while (!ExitButton());
-
 			break;
-
 
 		case 5:
 			closeGame = true;
@@ -53,7 +68,7 @@ void Menu()
 			break;
 		}
 
-	} while (closeGame == false);
+	}
 
 	CloseWindow();
 }
@@ -152,17 +167,11 @@ void DrawMenu(RECOPTIONS& play, RECOPTIONS& rules, RECOPTIONS& options, RECOPTIO
 
 void DrawRules()
 {
+
+
 	BeginDrawing();
-	ClearBackground(BLACK);
-	DrawText("Pong is a 2d game between two players. The objective is to score in ", 0, 55, 50, WHITE);
-	DrawText("the opposite zone to add 1 point whoever reaches 10 points first", 0, 205, 50, WHITE);
-	DrawText("will be the winner. This mod also adds power up.", 0, 305, 50, WHITE);
-	DrawText("Pressing SPACE pauses the game.", 0, 405, 50, WHITE);
-	DrawText("Player 1 will handle the left pad with the W and S arrows.", 0, 505, 50, WHITE);
-	DrawText("Player 2 controls the paddle with the UP and DOWN arrows.", 0, 650, 50, WHITE);
-	DrawText("There is also an AI option for those who don't want to play against another person.", 0, 750, 50, WHITE);
-	DrawRectangle(GetScreenWidth() - 100, 0, 100, 55, RED);
-	DrawText("Esc", GetScreenWidth() - 75, 25, 30, BLACK);
+
+	DrawExitButton();
 	EndDrawing();
 }
 
@@ -172,8 +181,7 @@ void DrawOptions()
 	ClearBackground(BLACK);
 	DrawRectangle(GetScreenWidth() / 2 - (MeasureText("Fullscreen/Windowed", 50) / 2), (GetScreenHeight() / 2), 700, 50, WHITE);
 	DrawText("P = Fullscreen/Windowed", GetScreenWidth() / 2 - (MeasureText("Fullscreen/Windowed", 50) / 2) + 50, GetScreenHeight() / 2, 50, BLACK);
-	DrawRectangle(GetScreenWidth() - 100, 0, 100, 55, RED);
-	DrawText("Esc", GetScreenWidth() - 75, 25, 30, BLACK);
+	DrawExitButton();
 	EndDrawing();
 }
 
@@ -182,12 +190,24 @@ void DrawCredits()
 	BeginDrawing();
 	ClearBackground(BLACK);
 	DrawText("Game Made by Enzo Coletta", (GetScreenWidth() / 2) - (MeasureText("Game Made by Enzo Coletta", 50) / 2), GetScreenHeight() / 2, 50, WHITE);
-	DrawRectangle(GetScreenWidth() - 100, 0, 100, 55, RED);
-	DrawText("Esc", GetScreenWidth() - 75, 25, 30, BLACK);
+	DrawExitButton();
 	EndDrawing();
+}
+
+void DrawExitButton()
+{
+	DrawRectangle(GetScreenWidth() - 100, 0, 100, 55, RED);
+	DrawText("EXIT", GetScreenWidth() - 75, 20, 25, BLACK);
 }
 
 bool ExitButton()
 {
-	return true;
+	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+	{
+		if ((GetMouseX() > (GetScreenWidth() - 100)) && (GetMouseY() < 55))
+		{
+			return true;
+		}
+	}
+	return false;
 }

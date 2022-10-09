@@ -1,19 +1,22 @@
 #include "game.h"
 
-void Game()
+Texture2D ship_idle;
+Texture2D scope;
+Texture2D AsteroidTipe_1;
+Sound shot1;
+
+void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 {
 	PLAYER P1 = CreatePlayer();
-	//textures
-	Texture2D ship_idle = LoadTexture("res/textures/Ship_idle (1).png");
-	Texture2D scope = LoadTexture("res/textures/scope.png");
-	Texture2D AsteroidTipe_1 = LoadTexture("res/textures/asteroid_1.png");
+	SFXvolume = 0.5f;
+	MusicVolume = 0.5f;
 
 	//asteroids
 	const int amountAsteroidsBig = 8;
-	const int amountAsteroidsMedium = 16;
-	const int amountAsteroidsSmall = 32;
-	const int maxAsteroids = 57;
-	ASTEROID arrayAsteroid[57];
+	const int amountAsteroidsMedium = amountAsteroidsBig * 2;
+	const int amountAsteroidsSmall = amountAsteroidsMedium * 2;
+	const int maxAsteroids = amountAsteroidsBig + amountAsteroidsMedium + amountAsteroidsSmall;
+	ASTEROID arrayAsteroid[maxAsteroids];
 	int counterMidAsteroid = 0;
 	int counterSmallAsteroids = 0;
 
@@ -22,12 +25,12 @@ void Game()
 		CreateAsteroidsBig(arrayAsteroid[i]);
 	}
 
-	for (int i = amountAsteroidsBig; i < amountAsteroidsBig + amountAsteroidsMedium + 1; i++)
+	for (int i = amountAsteroidsBig; i < amountAsteroidsBig + amountAsteroidsMedium; i++)
 	{
 		CreateAsteroidsMedium(arrayAsteroid[i]);
 	}
 
-	for (int i = amountAsteroidsBig + amountAsteroidsMedium + 1; i < maxAsteroids; i++)
+	for (int i = amountAsteroidsBig + amountAsteroidsMedium; i < maxAsteroids; i++)
 	{
 		CreateAsteroidsSmall(arrayAsteroid[i]);
 	}
@@ -48,7 +51,7 @@ void Game()
 	P1.ship.height = static_cast<float>(ship_idle.height);
 
 	HideCursor();
-	while (!WindowShouldClose() && P1.lives > 0)
+	while (P1.lives > 0 && !WindowShouldClose())
 	{
 		if (IsKeyPressed(KEY_P))
 		{
@@ -69,40 +72,31 @@ void Game()
 			PlayerF::PlayerWallColition(P1);
 			PlayerF::PlayerMovement(P1);
 			PlayerF::BulletAsteroidColition(arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, arrayBulets, maxAmmo, P1, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
-			//PlayerF::PlayerAsteroidColision(P1, ship_idle, arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
+			PlayerF::PlayerAsteroidColision(P1, arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
 			AsteroidF::AsteroidMovement(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidWallColition(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidReset(arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
 		}
-
-		if (IsKeyPressed(KEY_M))
+		else
 		{
-			for (int i = 0; i < maxAsteroids + 1; i++)
-			{
-				cout << "asteroid " << i << " = ";
-				if (arrayAsteroid[i].isDestroyed)
-				{
-					cout << "true" << endl;
-				}
-				else
-				{
-					cout << "false" << endl;
-				}
-
-				//arrayAsteroid[i].isDestroyed = true;
-				//P1.score ++;
-			}
+			PauseF::PauseLogic(SFXvolume, MusicVolume);
 		}
 
-		DrawF::DrawGame(P1, ship_idle, scope, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids);
+		if (IsKeyPressed(KEY_ESCAPE))
+		{
+			closeGame = false;
+			return;
+		}
 
+		DrawF::DrawGame(P1, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids, pause, SFXvolume, MusicVolume);
 	}
+
 }
 
 namespace DrawF
 {
 
-	void DrawGame(PLAYER P1, Texture2D ship_idle, Texture2D scope, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids)
+	void DrawGame(PLAYER P1, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids, bool pause, float SFXvolume, float MusicVolume)
 	{
 		Rectangle sourceShip = { 0.0f, 0.0f, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
 		Rectangle destRec = { P1.ship.x, P1.ship.y, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
@@ -157,14 +151,19 @@ namespace DrawF
 		//DrawLine(P1.ship.x, P1.ship.y, GetMouseX(), GetMouseY(), DARKGRAY);
 		//DrawCircle(P1.ship.x, P1.ship.y, 5, GREEN);
 
-
 		//score/lives/
-		DrawInfo(ship_idle, P1);
+		DrawInfo(P1);
+
+		if (pause == true)
+		{
+			PauseF::DrawPause(SFXvolume, MusicVolume);
+			DrawTexture(scope, static_cast<int>(GetMouseX() - 19.5), static_cast<int>(GetMouseY() - 19.5), WHITE);
+		}
 
 		EndDrawing();
 	}
 
-	void DrawInfo(Texture2D ship_idle, PLAYER P1)
+	void DrawInfo(PLAYER P1)
 	{
 		//table
 		DrawRectangle(0, 0, GetScreenWidth(), 75, BLACK);
@@ -188,11 +187,6 @@ namespace DrawF
 
 		//score
 		DrawText(TextFormat("%05i", P1.score), (GetScreenWidth() / 2), 0, 50, GREEN);
-
-	}
-
-	void DrawPause()
-	{
 
 	}
 }
@@ -229,32 +223,13 @@ namespace PlayerF
 
 		}
 
-
-		if (P1.shipAcceleration.x > 200 && P1.shipAcceleration.x > 0)
-		{
-			P1.shipAcceleration.x = 200;
-		}
-		else if (P1.shipAcceleration.x < -200 && P1.shipAcceleration.x < 0)
-		{
-			P1.shipAcceleration.x = -200;
-		}
-
-		if (P1.shipAcceleration.y > 200 && P1.shipAcceleration.y > 0)
-		{
-			P1.shipAcceleration.y = 200;
-		}
-		else if (P1.shipAcceleration.y < -200 && P1.shipAcceleration.y < 0)
-		{
-			P1.shipAcceleration.y = -200;
-		}
-
 		//cout << P1.speed.x << " " << P1.speed.y << endl;
 
 		P1.speed.x = P1.shipAcceleration.x;
 		P1.speed.y = P1.shipAcceleration.y;
 
-		P1.ship.x += P1.speed.x * GetFrameTime();
-		P1.ship.y += P1.speed.y * GetFrameTime();
+		P1.ship.x += P1.speed.x * GetFrameTime() / 4;
+		P1.ship.y += P1.speed.y * GetFrameTime() / 4;
 
 		P1.center.x = P1.ship.x + (P1.ship.width / 2);
 		P1.center.y = P1.ship.y + (P1.ship.height / 2);
@@ -322,7 +297,7 @@ namespace PlayerF
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
-
+			PlaySound(shot1);
 			counter++;
 			if (counter == maxAmmo)
 			{
@@ -355,7 +330,7 @@ namespace PlayerF
 
 	}
 
-	void PlayerAsteroidColision(PLAYER& P1, Texture2D ship_idle, ASTEROID arrayAsteroid[], int amountAsteroidsBig, int amountAsteroidsMedium, int& counterMidAsteroid, int& counterSmallAsteroid, int maxAsteroids)
+	void PlayerAsteroidColision(PLAYER& P1, ASTEROID arrayAsteroid[], int amountAsteroidsBig, int amountAsteroidsMedium, int& counterMidAsteroid, int& counterSmallAsteroid, int maxAsteroids)
 	{
 		for (int i = 0; i < maxAsteroids; i++)
 		{
@@ -397,70 +372,85 @@ namespace PlayerF
 	{
 		for (int i = 0; i < maxAsteroids; i++)
 		{
-			for (int x = 0; x < maxAmmo; x++)
+			if (arrayAsteroid[i].isDestroyed == false)
 			{
-				float distX = arrayBulets[x].Pos.x - arrayAsteroid[i].center.x;
-				float distY = arrayBulets[x].Pos.y - arrayAsteroid[i].center.y;
-				float distance = sqrt((distX * distX) + (distY * distY));
-
-				if (distance <= arrayBulets[x].radius + arrayAsteroid[i].radius)
+				for (int x = 0; x < maxAmmo; x++)
 				{
-					cout << "colision detectada" << endl;
-					arrayAsteroid[i].isDestroyed = true;
-					arrayBulets[x].isShoted = false;
-					P1.score++;
-
-
-					if (arrayAsteroid[i].isDestroyed && arrayAsteroid[i].size == Size::Big)
+					if (arrayBulets[x].isShoted)
 					{
-						cout << "creados 2 medium" << endl;
-						counterMidAsteroid += 2;
-						arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].center = arrayAsteroid[i].center;
-						arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].center = arrayAsteroid[i].center;
-						arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].isDestroyed = false;
-						arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].isDestroyed = false;
 
-						do
-						{
-							arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x > -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x < 100);
-						do
-						{
-							arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y > -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y < 100);
 
-						do
-						{
-							arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x < -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x < 100);
+						float distX = arrayBulets[x].Pos.x - arrayAsteroid[i].center.x;
+						float distY = arrayBulets[x].Pos.y - arrayAsteroid[i].center.y;
+						float distance = sqrt((distX * distX) + (distY * distY));
 
-						do
+						if (distance <= arrayBulets[x].radius + arrayAsteroid[i].radius)
 						{
-							arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y < -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y < 100);
+							//cout << "colision detectada" << endl;
+							arrayAsteroid[i].isDestroyed = true;
+							arrayBulets[x].isShoted = false;
+							P1.score++;
 
+
+							if (arrayAsteroid[i].isDestroyed && arrayAsteroid[i].size == Size::Big)
+							{
+								//cout << "creados 2 medium" << endl;
+								counterMidAsteroid += 2;
+								arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].center = arrayAsteroid[i].center;
+								arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].center = arrayAsteroid[i].center;
+								arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].isDestroyed = false;
+								arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].isDestroyed = false;
+								//asteroid 1
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x > -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.x < 100);
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y > -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid].speed.y < 100);
+								//asteroid 2
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x < -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.x < 100);
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y < -100 && arrayAsteroid[amountAsteroidsBig + counterMidAsteroid - 1].speed.y < 100);
+
+							}
+							else if (arrayAsteroid[i].isDestroyed && arrayAsteroid[i].size == Size::Medium)
+							{
+								//	cout << "creados 2 small" << endl;
+								counterSmallAsteroid += 2;
+								arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].center = arrayAsteroid[i].center;
+								arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].center = arrayAsteroid[i].center;
+								arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].isDestroyed = false;
+								arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].isDestroyed = false;
+
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x > -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x < 100);
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.y = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.y > -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.y < 100);
+
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.x = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.x < -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.x < 100);
+								do
+								{
+									arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y = static_cast<float>(GetRandomValue(-200, 200));
+								} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y < -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y < 100);
+
+							}
+							x = maxAmmo;
+						}
 					}
-					else if (arrayAsteroid[i].isDestroyed && arrayAsteroid[i].size == Size::Medium)
-					{
-						cout << "creados 2 small" << endl;
-						counterSmallAsteroid += 2;
-						arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].center = arrayAsteroid[i].center;
-						arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].center = arrayAsteroid[i].center;
-						arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].isDestroyed = false;
-						arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].isDestroyed = false;
-
-						do
-						{
-							arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x > -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid].speed.x < 100);
-
-						do
-						{
-							arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y = static_cast<float>(GetRandomValue(-200, 200));
-						} while (arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y < -100 && arrayAsteroid[amountAsteroidsBig + amountAsteroidsMedium + counterSmallAsteroid - 1].speed.y < 100);
-
-					}
-					x = maxAmmo;
 				}
 			}
 
@@ -485,8 +475,6 @@ namespace AsteroidF
 				arrayAsteroid[x].center.y += arrayAsteroid[x].speed.y * GetFrameTime();
 			}
 		}
-
-
 	}
 
 	void AsteroidWallColition(ASTEROID arrayAsteroid[], int maxAsteroids)
@@ -519,7 +507,7 @@ namespace AsteroidF
 	{
 		int counter = 0;
 
-		for (int i = 0; i < maxAsteroids + 1; i++)
+		for (int i = 0; i < maxAsteroids; i++)
 		{
 			if (arrayAsteroid[i].isDestroyed)
 			{
@@ -527,19 +515,19 @@ namespace AsteroidF
 			}
 		}
 
-		if (counter == maxAsteroids + 1)
+		if (counter == maxAsteroids)
 		{
 			for (int i = 0; i < amountAsteroidsBig; i++)
 			{
 				CreateAsteroidsBig(arrayAsteroid[i]);
 			}
 
-			for (int i = amountAsteroidsBig; i < amountAsteroidsBig + amountAsteroidsMedium + 1; i++)
+			for (int i = amountAsteroidsBig; i < amountAsteroidsBig + amountAsteroidsMedium; i++)
 			{
 				CreateAsteroidsMedium(arrayAsteroid[i]);
 			}
 
-			for (int i = amountAsteroidsBig + amountAsteroidsMedium + 1; i < maxAsteroids; i++)
+			for (int i = amountAsteroidsBig + amountAsteroidsMedium; i < maxAsteroids; i++)
 			{
 				CreateAsteroidsSmall(arrayAsteroid[i]);
 			}
@@ -549,4 +537,68 @@ namespace AsteroidF
 		}
 
 	}
+}
+
+namespace PauseF
+{
+	void PauseLogic(float& SFXvolume, float& MusicVolume)
+	{
+		SFXvolume = 0.5f;
+		MusicVolume = 0.5f;
+	}
+
+	void DrawPause(float SFXvolume, float MusicVolume)
+	{
+		float numberSFX = SFXvolume;
+		float numberMusic = MusicVolume;
+
+		numberSFX *= 10;
+		numberMusic *= 10;
+
+		Vector2 backPauseWH = { 700, 700 };
+		Vector2 backPauseXY = { (GetScreenWidth() / 2) - (backPauseWH.x / 2),  (GetScreenHeight() / 2) - (backPauseWH.y) / 2 };
+		//draw background
+		DrawRectangle(static_cast<int>(backPauseXY.x), static_cast<int>(backPauseXY.y), static_cast<int>(backPauseWH.x), static_cast<int>(backPauseWH.y), YELLOW);
+		//options
+		
+		//--resume--
+		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) - 250, 80, 80, RED);
+		DrawText("RESUME", (GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) - 250, 40, BLACK);
+
+		//--sound--
+		DrawText("SOUND", (GetScreenWidth() / 2) - (MeasureText("SOUND", 40) / 2), (GetScreenHeight() / 2) - 100, 40, BLACK);
+		//DrawRectangle();
+		//DrawText();
+		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) - 60, 80, 80, RED);
+		//DrawText(TextFormat("%02i", numberSFX), (GetScreenWidth() / 2) - 35, (GetScreenHeight() / 2)+70, 70, WHITE);
+		//DrawRectangle();
+		//DrawText();
+
+		//--music--
+		DrawText("MUSIC", (GetScreenWidth() / 2) - (MeasureText("MUSIC", 40) / 2), (GetScreenHeight() / 2)+40, 40, BLACK);
+		//DrawRectangle();
+		//DrawText();
+		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2)+40+50, 80, 80, RED);
+		//DrawText(TextFormat("%02i", numberMusic), (GetScreenWidth() / 2) - 35, (GetScreenHeight() / 2)-70, 70, WHITE);
+		//DrawRectangle();
+		//DrawText();
+
+		//--exit--
+		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) + 250, 80, 80, RED);
+		DrawText("EXIT", (GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) + 250, 40, BLACK);
+
+
+		DrawLine((GetScreenWidth() / 2), 0, (GetScreenWidth() / 2), GetScreenHeight(), BLACK);
+		DrawLine(0, GetScreenHeight() / 2, GetScreenWidth(), GetScreenHeight() / 2, BLACK);
+	}
+}
+
+namespace PowerUpF
+{
+
+}
+
+namespace EnemyF
+{
+
 }

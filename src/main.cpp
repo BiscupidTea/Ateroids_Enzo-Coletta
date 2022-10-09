@@ -2,7 +2,9 @@
 
 int main()
 {
-	InitWindow(1000, 900, "Asteroids");
-	Game();
+	InitWindow(1200, 900, "Asteroids");
+	InitAudioDevice();
+	Menu();
+	CloseAudioDevice();
 	return 0;
 }

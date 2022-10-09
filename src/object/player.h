@@ -25,4 +25,8 @@ struct BULLETS
 };
 
 PLAYER CreatePlayer();
-void CreateBullets(BULLETS& bulet, PLAYER P1);
+
+void CreateBullets(
+	BULLETS& bulet, 
+	PLAYER P1
+);
