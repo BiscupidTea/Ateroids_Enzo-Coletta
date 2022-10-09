@@ -32,6 +32,8 @@ void DrawCredits();
 
 void DrawRules();
 
+void DrawExitButton();
+
 bool PointRectangleColision(
 	float& x, 
 	float& y, 

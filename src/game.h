@@ -7,23 +7,23 @@
 
 using namespace std;
 
-void Game();
-
+void Game(bool& closeGame, float& SFXvolume, float& MusicVolume);
 
 namespace DrawF
 {
 	void DrawGame(
 		PLAYER P1,
-		Texture2D ship_idle,
-		Texture2D scope,
 		BULLETS arrayBulets[],
 		int maxAmmo,
 		ASTEROID arrayAsteroid[],
-		int maxAsteroids
+		int maxAsteroids,
+		bool pause,
+		float SFXvolume, 
+		float MusicVolume
+
 	);
 
 	void DrawInfo(
-		Texture2D consol1, 
 		PLAYER P1
 	);
 }
@@ -53,7 +53,6 @@ namespace PlayerF
 
 	void PlayerAsteroidColision(
 		PLAYER& P1, 
-		Texture2D ship_idle,
 		ASTEROID arrayAsteroid[],
 		int amountAsteroidsBig,
 		int amountAsteroidsMedium,
@@ -95,4 +94,21 @@ namespace AsteroidF
 		int& counterSmallAsteroid,
 		int maxAsteroids
 	);
+}
+
+namespace PauseF
+{
+	void PauseLogic(float& SFXvolume, float& MusicVolume);
+
+	void DrawPause(float SFXvolume, float MusicVolume);
+}
+
+namespace PowerUpF
+{
+
+}
+
+namespace EnemyF
+{
+
 }

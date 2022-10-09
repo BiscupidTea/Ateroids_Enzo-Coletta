@@ -24,12 +24,14 @@
     <ClCompile Include="..\src\menu.cpp" />
     <ClCompile Include="..\src\object\asteroid.cpp" />
     <ClCompile Include="..\src\object\player.cpp" />
+    <ClCompile Include="enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\menu.h" />
     <ClInclude Include="..\src\object\asteroid.h" />
     <ClInclude Include="..\src\object\player.h" />
+    <ClInclude Include="enemy.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
