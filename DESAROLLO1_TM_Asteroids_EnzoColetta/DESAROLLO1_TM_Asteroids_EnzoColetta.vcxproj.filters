@@ -24,7 +24,7 @@
     <ClCompile Include="..\src\object\asteroid.cpp">
       <Filter>src\object</Filter>
     </ClCompile>
-    <ClCompile Include="enemy.cpp">
+    <ClCompile Include="..\src\object\enemy.cpp">
       <Filter>src\object</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClInclude Include="..\src\object\asteroid.h">
       <Filter>src\object</Filter>
     </ClInclude>
-    <ClInclude Include="enemy.h">
+    <ClInclude Include="..\src\object\enemy.h">
       <Filter>src\object</Filter>
     </ClInclude>
   </ItemGroup>

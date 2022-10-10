@@ -7,9 +7,13 @@ Sound shot1;
 
 void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 {
+	//declaraciones//
 	PLAYER P1 = CreatePlayer();
+	ENEMY E1 = CreateEnemy();
 	SFXvolume = 0.5f;
 	MusicVolume = 0.5f;
+	float timer = 0;
+	float maxTimer = 7;
 
 	//asteroids
 	const int amountAsteroidsBig = 8;
@@ -45,12 +49,16 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 		CreateBullets(arrayBulets[i], P1);
 	}
 
+	//others
 	bool pause = false;
 	int counterBullet = 0;
 	P1.ship.width = static_cast<float>(ship_idle.width);
 	P1.ship.height = static_cast<float>(ship_idle.height);
 
 	HideCursor();
+
+	///////////start game/////////////
+
 	while (P1.lives > 0 && !WindowShouldClose())
 	{
 		if (IsKeyPressed(KEY_P))
@@ -76,19 +84,37 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 			AsteroidF::AsteroidMovement(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidWallColition(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidReset(arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
+			EnemyF::EnemyMovement(E1);
+			EnemyF::EnemyWallColition(E1);
+			EnemyF::EnemyPlayerColition(E1, P1);
+			EnemyF::EnemyBulletColition(P1, E1, arrayBulets, maxAmmo);
+
 		}
 		else
 		{
-			PauseF::PauseLogic(SFXvolume, MusicVolume);
+			PauseF::PauseLogic(SFXvolume, MusicVolume, closeGame);
 		}
 
-		if (IsKeyPressed(KEY_ESCAPE))
+		if (E1.isDead && (timer >= maxTimer))
+		{
+			EnemyF::EnemyReset(E1);
+		}
+
+		if (timer >= maxTimer + 1)
+		{
+			timer = 0;
+		}
+
+		timer += GetFrameTime();
+
+		DrawF::DrawGame(P1, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids, pause, SFXvolume, MusicVolume, E1);
+
+		if (P1.lives <= 0)
 		{
 			closeGame = false;
 			return;
 		}
-
-		DrawF::DrawGame(P1, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids, pause, SFXvolume, MusicVolume);
+		cout << timer << endl;
 	}
 
 }
@@ -96,7 +122,7 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 namespace DrawF
 {
 
-	void DrawGame(PLAYER P1, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids, bool pause, float SFXvolume, float MusicVolume)
+	void DrawGame(PLAYER P1, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids, bool pause, float SFXvolume, float MusicVolume, ENEMY E1)
 	{
 		Rectangle sourceShip = { 0.0f, 0.0f, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
 		Rectangle destRec = { P1.ship.x, P1.ship.y, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
@@ -145,6 +171,12 @@ namespace DrawF
 		//player 
 		DrawTexturePro(ship_idle, sourceShip, destRec, P1.origin, P1.rotation, WHITE);
 		DrawTexture(scope, static_cast<int>(GetMouseX() - 19.5), static_cast<int>(GetMouseY() - 19.5), WHITE);
+
+		//enemy
+		if (!E1.isDead)
+		{
+			DrawRectangle(static_cast<int>(E1.enemy.x), static_cast<int>(E1.enemy.y), static_cast<int>(E1.enemy.width), static_cast<int>(E1.enemy.height), RED);
+		}
 
 		//draw extra info
 		//DrawCircle(P1.ship.x, P1.ship.y, (ship_idle.width / 2 + 2), RED);
@@ -541,8 +573,9 @@ namespace AsteroidF
 
 namespace PauseF
 {
-	void PauseLogic(float& SFXvolume, float& MusicVolume)
+	void PauseLogic(float& SFXvolume, float& MusicVolume, bool& closeGame)
 	{
+		closeGame;
 		SFXvolume = 0.5f;
 		MusicVolume = 0.5f;
 	}
@@ -560,7 +593,7 @@ namespace PauseF
 		//draw background
 		DrawRectangle(static_cast<int>(backPauseXY.x), static_cast<int>(backPauseXY.y), static_cast<int>(backPauseWH.x), static_cast<int>(backPauseWH.y), YELLOW);
 		//options
-		
+
 		//--resume--
 		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) - 250, 80, 80, RED);
 		DrawText("RESUME", (GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) - 250, 40, BLACK);
@@ -575,10 +608,10 @@ namespace PauseF
 		//DrawText();
 
 		//--music--
-		DrawText("MUSIC", (GetScreenWidth() / 2) - (MeasureText("MUSIC", 40) / 2), (GetScreenHeight() / 2)+40, 40, BLACK);
+		DrawText("MUSIC", (GetScreenWidth() / 2) - (MeasureText("MUSIC", 40) / 2), (GetScreenHeight() / 2) + 40, 40, BLACK);
 		//DrawRectangle();
 		//DrawText();
-		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2)+40+50, 80, 80, RED);
+		DrawRectangle((GetScreenWidth() / 2) - 40, (GetScreenHeight() / 2) + 40 + 50, 80, 80, RED);
 		//DrawText(TextFormat("%02i", numberMusic), (GetScreenWidth() / 2) - 35, (GetScreenHeight() / 2)-70, 70, WHITE);
 		//DrawRectangle();
 		//DrawText();
@@ -600,5 +633,73 @@ namespace PowerUpF
 
 namespace EnemyF
 {
+	void EnemyMovement(ENEMY& E1)
+	{
+		E1.enemy.x += E1.speed * GetFrameTime();
+
+		E1.center.x = E1.enemy.x + (E1.enemy.width / 2);
+		E1.center.y = E1.enemy.y + (E1.enemy.height / 2);
+
+		E1.origin.x = (E1.enemy.width / 2);
+		E1.origin.y = (E1.enemy.height / 2);
+	}
+
+	void EnemyWallColition(ENEMY& E1)
+	{
+		if (E1.enemy.x < 0 - E1.enemy.width || E1.enemy.x > GetScreenWidth())
+		{
+			E1.speed *= -1;
+			E1.enemy.y = static_cast<float>(GetRandomValue(75, (GetScreenHeight() - (static_cast<int> (E1.enemy.height)))));
+		}
+
+	}
+
+	void EnemyPlayerColition(ENEMY& E1, PLAYER& P1)
+	{
+		if (!E1.isDead)
+		{
+			if (CheckCollisionCircleRec(P1.center, 5, E1.enemy))
+			{
+				P1.lives--;
+				P1.speed.x = 0;
+				P1.speed.y = 0;
+				P1.ship.x = static_cast<float>(GetScreenWidth() / 2);
+				P1.ship.y = static_cast<float>(GetScreenHeight() / 2);
+				E1.isDead = true;
+			}
+		}
+	}
+
+	void EnemyBulletColition(PLAYER& P1, ENEMY& E1, BULLETS arrayBulets[], int maxAmmo)
+	{
+		if (!E1.isDead)
+		{
+			for (int x = 0; x < maxAmmo; x++)
+			{
+				if (CheckCollisionCircleRec(arrayBulets[x].Pos, arrayBulets[x].radius, E1.enemy))
+				{
+					E1.isDead = true;
+					arrayBulets[x].isShoted = false;
+					x = maxAmmo;
+					P1.score += 5;
+				}
+			}
+		}
+	}
+
+	void EnemyReset(ENEMY& E1)
+	{
+		E1.isDead = false;
+		if (GetRandomValue(1, 2) == 1)
+		{
+			E1.enemy.x = 0 - E1.enemy.width;
+		}
+		else
+		{
+			E1.enemy.x = static_cast<float>(GetScreenWidth());
+		}
+
+		E1.enemy.y = static_cast<float>(GetRandomValue(75, (GetScreenHeight() - (static_cast<int> (E1.enemy.height)))));
+	}
 
 }

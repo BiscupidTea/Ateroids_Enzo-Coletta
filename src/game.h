@@ -4,6 +4,7 @@
 #include "raymath.h"
 #include "object/player.h"
 #include "object/asteroid.h"
+#include "object/enemy.h"
 
 using namespace std;
 
@@ -19,7 +20,8 @@ namespace DrawF
 		int maxAsteroids,
 		bool pause,
 		float SFXvolume, 
-		float MusicVolume
+		float MusicVolume,
+		ENEMY E1
 
 	);
 
@@ -98,9 +100,16 @@ namespace AsteroidF
 
 namespace PauseF
 {
-	void PauseLogic(float& SFXvolume, float& MusicVolume);
+	void PauseLogic(
+		float& SFXvolume, 
+		float& MusicVolume,
+		bool& closeGame
+	);
 
-	void DrawPause(float SFXvolume, float MusicVolume);
+	void DrawPause(
+		float SFXvolume, 
+		float MusicVolume
+	);
 }
 
 namespace PowerUpF
@@ -110,5 +119,28 @@ namespace PowerUpF
 
 namespace EnemyF
 {
+	void EnemyMovement(
+		ENEMY& E1
+	);
+
+	void EnemyWallColition(
+		ENEMY& E1
+	);
+
+	void EnemyPlayerColition(
+		ENEMY& E1,
+		PLAYER& P1
+	);
+
+	void EnemyBulletColition(
+		PLAYER& P1,
+		ENEMY& E1,
+		BULLETS arrayBulets[],
+		int maxAmmo
+	);
+
+	void EnemyReset(
+		ENEMY& E1
+	);
 
 }
