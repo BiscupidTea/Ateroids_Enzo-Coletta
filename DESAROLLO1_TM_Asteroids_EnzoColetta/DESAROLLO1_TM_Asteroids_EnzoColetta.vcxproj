@@ -25,6 +25,7 @@
     <ClCompile Include="..\src\object\asteroid.cpp" />
     <ClCompile Include="..\src\object\enemy.cpp" />
     <ClCompile Include="..\src\object\player.cpp" />
+    <ClCompile Include="..\src\object\powerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\game.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="..\src\object\asteroid.h" />
     <ClInclude Include="..\src\object\enemy.h" />
     <ClInclude Include="..\src\object\player.h" />
+    <ClInclude Include="..\src\object\powerUp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -120,8 +122,17 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>IF NOT EXIST "$(TargetDir)res\" (
+CD $(TargetDir)
+MKDIR res
+
+CD res
+
+MKDIR sounds
+MKDIR textures
+
+XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\textures"  "$(TargetDir)res\textures"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -168,8 +179,17 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>IF NOT EXIST "$(TargetDir)res\" (
+CD $(TargetDir)
+MKDIR res
+
+CD res
+
+MKDIR sounds
+MKDIR textures
+
+XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\textures"  "$(TargetDir)res\textures"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

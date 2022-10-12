@@ -27,11 +27,11 @@ ENEMY CreateEnemy()
 
 	if (E1.enemy.x > GetScreenWidth())
 	{
-		E1.speed = -700;
+		E1.speed = -800;
 	}
 	else
 	{
-		E1.speed = 700;
+		E1.speed = 800;
 	}
 
 	E1.isDead = true;

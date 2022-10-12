@@ -2,7 +2,7 @@
 
 int main()
 {
-	InitWindow(1200, 900, "Asteroids");
+	InitWindow(1024, 768, "Asteroids");
 	InitAudioDevice();
 	Menu();
 	CloseAudioDevice();

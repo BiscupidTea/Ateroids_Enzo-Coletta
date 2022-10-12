@@ -12,3 +12,4 @@ struct ENEMY
 };
 
 ENEMY CreateEnemy();
+

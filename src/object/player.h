@@ -12,6 +12,7 @@ struct PLAYER
 	int score;
 	Vector2 shipAcceleration;
 	Vector2 speed;
+	float radius;
 
 };
 

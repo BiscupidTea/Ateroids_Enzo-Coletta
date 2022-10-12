@@ -5,8 +5,11 @@ void Menu()
 	extern Texture2D ship_idle;
 	extern Texture2D scope;
 	extern Texture2D AsteroidTipe_1;
+	extern Texture2D background;
+
 	extern Sound shot1;
 
+	background = LoadTexture("res/textures/background.jpg");
 	ship_idle = LoadTexture("res/textures/Ship_idle (1).png");
 	scope = LoadTexture("res/textures/scope.png");
 	AsteroidTipe_1 = LoadTexture("res/textures/asteroid_1.png");

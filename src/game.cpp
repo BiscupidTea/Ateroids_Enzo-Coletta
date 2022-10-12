@@ -14,6 +14,7 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 	MusicVolume = 0.5f;
 	float timer = 0;
 	float maxTimer = 7;
+	P1.radius = ship_idle.width / static_cast <float>(2);
 
 	//asteroids
 	const int amountAsteroidsBig = 8;
@@ -41,13 +42,16 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 
 
 	//bulets
-	const int maxAmmo = 30;
+	const int maxAmmo = 60;
 	BULLETS arrayBulets[maxAmmo];
 
 	for (int i = 0; i < maxAmmo; i++)
 	{
 		CreateBullets(arrayBulets[i], P1);
 	}
+
+	//power ups
+	POWERUP powerUp = CreatePowerUp();
 
 	//others
 	bool pause = false;
@@ -76,17 +80,17 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 		if (pause == false)
 		{
 			PlayerF::BulletState(arrayBulets, maxAmmo, P1);
-			PlayerF::PlayerShoot(arrayBulets, counterBullet, P1, maxAmmo);
+			PlayerF::PlayerShoot(arrayBulets, counterBullet, P1, maxAmmo, powerUp);
 			PlayerF::PlayerWallColition(P1);
 			PlayerF::PlayerMovement(P1);
 			PlayerF::BulletAsteroidColition(arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, arrayBulets, maxAmmo, P1, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
-			PlayerF::PlayerAsteroidColision(P1, arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
+			PlayerF::PlayerAsteroidColision(P1, arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids, powerUp);
 			AsteroidF::AsteroidMovement(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidWallColition(arrayAsteroid, maxAsteroids);
 			AsteroidF::AsteroidReset(arrayAsteroid, amountAsteroidsBig, amountAsteroidsMedium, counterMidAsteroid, counterSmallAsteroids, maxAsteroids);
 			EnemyF::EnemyMovement(E1);
 			EnemyF::EnemyWallColition(E1);
-			EnemyF::EnemyPlayerColition(E1, P1);
+			EnemyF::EnemyPlayerColition(E1, P1, powerUp);
 			EnemyF::EnemyBulletColition(P1, E1, arrayBulets, maxAmmo);
 
 		}
@@ -94,35 +98,53 @@ void Game(bool& closeGame, float& SFXvolume, float& MusicVolume)
 		{
 			PauseF::PauseLogic(SFXvolume, MusicVolume, closeGame);
 		}
-
-		if (E1.isDead && (timer >= maxTimer))
+		//powerup
+		if (!powerUp.picked && !powerUp.isActive)
 		{
-			EnemyF::EnemyReset(E1);
+			powerUp.timerC += GetFrameTime();
+
+			if (powerUp.timerC >= powerUp.timerMaxC)
+			{
+				powerUp.isActive = true;
+				powerUp.picked = false;
+			}
+		}
+		if (powerUp.isActive)
+		{
+			PowerUpF::PowerUpPlayerColision(powerUp, P1);
 		}
 
-		if (timer >= maxTimer + 1)
+		if (powerUp.picked)
 		{
-			timer = 0;
+			powerUp.timerA += GetFrameTime();
+			if (powerUp.timerA >= powerUp.timerMaxA)
+			{
+				powerUp.isActive = false;
+				powerUp.picked = false;
+				powerUp.timerC = 0;
+				CreatePowerUp();
+			}
 		}
 
-		timer += GetFrameTime();
+		//enemy
+		EnemyF::EnemyTimer(E1, timer, maxTimer);
 
-		DrawF::DrawGame(P1, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids, pause, SFXvolume, MusicVolume, E1);
+		//draw
+		DrawF::DrawGame(P1, arrayBulets, maxAmmo, arrayAsteroid, maxAsteroids, pause, SFXvolume, MusicVolume, E1, powerUp);
 
 		if (P1.lives <= 0)
 		{
+			LooseScreen(P1);
 			closeGame = false;
 			return;
 		}
-		cout << timer << endl;
 	}
 
 }
 
 namespace DrawF
 {
-
-	void DrawGame(PLAYER P1, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids, bool pause, float SFXvolume, float MusicVolume, ENEMY E1)
+	void DrawGame(PLAYER P1, BULLETS arrayBulets[], int maxAmmo, ASTEROID arrayAsteroid[], int maxAsteroids, bool pause, float SFXvolume, float MusicVolume, ENEMY E1, POWERUP powerUp)
 	{
 		Rectangle sourceShip = { 0.0f, 0.0f, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
 		Rectangle destRec = { P1.ship.x, P1.ship.y, static_cast<float>(ship_idle.width), static_cast<float>(ship_idle.height) };
@@ -171,6 +193,10 @@ namespace DrawF
 		//player 
 		DrawTexturePro(ship_idle, sourceShip, destRec, P1.origin, P1.rotation, WHITE);
 		DrawTexture(scope, static_cast<int>(GetMouseX() - 19.5), static_cast<int>(GetMouseY() - 19.5), WHITE);
+		if (powerUp.picked && powerUp.invincible)
+		{
+			DrawCircle(static_cast<int>(P1.ship.x), static_cast<int>(P1.ship.y), P1.radius, SKYBLUE);
+		}
 
 		//enemy
 		if (!E1.isDead)
@@ -178,10 +204,15 @@ namespace DrawF
 			DrawRectangle(static_cast<int>(E1.enemy.x), static_cast<int>(E1.enemy.y), static_cast<int>(E1.enemy.width), static_cast<int>(E1.enemy.height), RED);
 		}
 
-		//draw extra info
-		//DrawCircle(P1.ship.x, P1.ship.y, (ship_idle.width / 2 + 2), RED);
-		//DrawLine(P1.ship.x, P1.ship.y, GetMouseX(), GetMouseY(), DARKGRAY);
-		//DrawCircle(P1.ship.x, P1.ship.y, 5, GREEN);
+		//draw powerups
+		if (powerUp.isActive && powerUp.invincible)
+		{
+			DrawCircle(static_cast<int>(powerUp.center.x), static_cast<int>(powerUp.center.y), powerUp.radius, BLUE);
+		}
+		else if (powerUp.isActive && powerUp.shot3r)
+		{
+			DrawCircle(static_cast<int>(powerUp.center.x), static_cast<int>(powerUp.center.y), powerUp.radius, VIOLET);
+		}
 
 		//score/lives/
 		DrawInfo(P1);
@@ -319,35 +350,58 @@ namespace PlayerF
 		}
 	}
 
-	void PlayerShoot(BULLETS arrayBulets[], int& counter, PLAYER& P1, int maxAmmo)
+	void PlayerShoot(BULLETS arrayBulets[], int& counter, PLAYER& P1, int maxAmmo, POWERUP powerUp)
 	{
 		Vector2 vectorDirection;
 		Vector2 normalizeDirection;
-
 		vectorDirection.x = GetMouseX() - P1.ship.x;
 		vectorDirection.y = GetMouseY() - P1.ship.y;
 
+
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
+			normalizeDirection = Vector2Normalize(vectorDirection);
 			PlaySound(shot1);
-			counter++;
 			if (counter == maxAmmo)
 			{
 				counter = 0;
 			}
 
-			normalizeDirection = Vector2Normalize(vectorDirection);
+			if (powerUp.picked && powerUp.shot3r)
+			{
+				arrayBulets[counter].speed.x += normalizeDirection.x;
+				arrayBulets[counter].speed.y += normalizeDirection.y;
+				arrayBulets[counter].speed.x *= 500;
+				arrayBulets[counter].speed.y *= 500;
+				arrayBulets[counter].isShoted = true;
 
-			arrayBulets[counter].speed.x += normalizeDirection.x;
-			arrayBulets[counter].speed.y += normalizeDirection.y;
-			arrayBulets[counter].speed.x *= 500;
-			arrayBulets[counter].speed.y *= 500;
-			arrayBulets[counter].isShoted = true;
-			//cout << "shot " << counter << endl;
+				arrayBulets[counter + 1].speed.x += (normalizeDirection.x);
+				arrayBulets[counter + 1].speed.y += normalizeDirection.y;
+				arrayBulets[counter + 1].speed.x *= 400;
+				arrayBulets[counter + 1].speed.y *= 400;
+				arrayBulets[counter + 1].isShoted = true;
+
+				arrayBulets[counter + 2].speed.x += normalizeDirection.x;
+				arrayBulets[counter + 2].speed.y += normalizeDirection.y;
+				arrayBulets[counter + 2].speed.x *= 300;
+				arrayBulets[counter + 2].speed.y *= 300;
+				arrayBulets[counter + 2].isShoted = true;
+				counter += 3;
+			}
+			else
+			{
+				arrayBulets[counter].speed.x += normalizeDirection.x;
+				arrayBulets[counter].speed.y += normalizeDirection.y;
+				arrayBulets[counter].speed.x *= 500;
+				arrayBulets[counter].speed.y *= 500;
+				arrayBulets[counter].isShoted = true;
+				counter++;
+			}
+
+			//cout << "normal shot " << counter << endl;
 			//cout << normalizeDirection.x << " " << normalizeDirection.y << endl;
-		}
 
-		//cout << arrayBulets[counter-1].Pos.x << " " << arrayBulets[counter - 1].Pos.y << endl;
+		}
 
 		for (int i = 0; i < maxAmmo; i++)
 		{
@@ -362,40 +416,48 @@ namespace PlayerF
 
 	}
 
-	void PlayerAsteroidColision(PLAYER& P1, ASTEROID arrayAsteroid[], int amountAsteroidsBig, int amountAsteroidsMedium, int& counterMidAsteroid, int& counterSmallAsteroid, int maxAsteroids)
+	void PlayerAsteroidColision(PLAYER& P1, ASTEROID arrayAsteroid[], int amountAsteroidsBig, int amountAsteroidsMedium, int& counterMidAsteroid, int& counterSmallAsteroid, int maxAsteroids, POWERUP powerUp)
 	{
-		for (int i = 0; i < maxAsteroids; i++)
+		if (powerUp.picked && powerUp.invincible)
 		{
-			float distX = P1.ship.x - arrayAsteroid[i].center.x;
-			float distY = P1.ship.y - arrayAsteroid[i].center.y;
-			float distance = sqrt((distX * distX) + (distY * distY));
 
-			if (distance <= (ship_idle.width / 2 + 2) + arrayAsteroid[i].radius)
+		}
+		else
+		{
+
+			for (int i = 0; i < maxAsteroids; i++)
 			{
-				P1.lives--;
-				P1.speed.x = 0;
-				P1.speed.y = 0;
-				P1.ship.x = static_cast<float>(GetScreenWidth() / 2);
-				P1.ship.y = static_cast<float>(GetScreenHeight() / 2);
+				float distX = P1.ship.x - arrayAsteroid[i].center.x;
+				float distY = P1.ship.y - arrayAsteroid[i].center.y;
+				float distance = sqrt((distX * distX) + (distY * distY));
 
-				for (int x = 0; x < amountAsteroidsBig; x++)
+				if (distance <= (ship_idle.width / 2 + 2) + arrayAsteroid[i].radius)
 				{
-					CreateAsteroidsBig(arrayAsteroid[x]);
+					P1.lives--;
+					P1.speed.x = 0;
+					P1.speed.y = 0;
+					P1.ship.x = static_cast<float>(GetScreenWidth() / 2);
+					P1.ship.y = static_cast<float>(GetScreenHeight() / 2);
 
+					for (int x = 0; x < amountAsteroidsBig; x++)
+					{
+						CreateAsteroidsBig(arrayAsteroid[x]);
+
+					}
+
+					for (int x = amountAsteroidsBig + 1; x < amountAsteroidsBig + amountAsteroidsMedium; x++)
+					{
+						CreateAsteroidsMedium(arrayAsteroid[x]);
+					}
+
+					for (int x = amountAsteroidsBig + amountAsteroidsMedium + 1; x < maxAsteroids; x++)
+					{
+						CreateAsteroidsSmall(arrayAsteroid[x]);
+					}
+
+					counterMidAsteroid = 0;
+					counterSmallAsteroid = 0;
 				}
-
-				for (int x = amountAsteroidsBig + 1; x < amountAsteroidsBig + amountAsteroidsMedium; x++)
-				{
-					CreateAsteroidsMedium(arrayAsteroid[x]);
-				}
-
-				for (int x = amountAsteroidsBig + amountAsteroidsMedium + 1; x < maxAsteroids; x++)
-				{
-					CreateAsteroidsSmall(arrayAsteroid[x]);
-				}
-
-				counterMidAsteroid = 0;
-				counterSmallAsteroid = 0;
 			}
 		}
 	}
@@ -628,11 +690,43 @@ namespace PauseF
 
 namespace PowerUpF
 {
+	void PowerUpPlayerColision(POWERUP& powerUp, PLAYER& P1)
+	{
+		float distX = P1.ship.x - powerUp.center.x;
+		float distY = P1.ship.y - powerUp.center.y;
+		float distance = sqrt((distX * distX) + (distY * distY));
 
+		if (distance <= (ship_idle.width / 2 + 2) + powerUp.radius)
+		{
+			powerUp.picked = true;
+			powerUp.isActive = false;
+			powerUp.timerA = 0;
+		}
+		
+	}
 }
 
 namespace EnemyF
 {
+	void EnemyTimer(ENEMY& E1, float& timer, float& maxTimer)
+	{
+		if (E1.isDead && (timer >= maxTimer))
+		{
+			EnemyF::EnemyReset(E1);
+		}
+
+		if ((timer >= maxTimer) && !E1.isDead)
+		{
+			timer = 0;
+		}
+
+		if (E1.isDead)
+		{
+			timer += GetFrameTime();
+		}
+		cout << timer << endl;
+	}
+
 	void EnemyMovement(ENEMY& E1)
 	{
 		E1.enemy.x += E1.speed * GetFrameTime();
@@ -654,18 +748,25 @@ namespace EnemyF
 
 	}
 
-	void EnemyPlayerColition(ENEMY& E1, PLAYER& P1)
+	void EnemyPlayerColition(ENEMY& E1, PLAYER& P1, POWERUP powerUp)
 	{
-		if (!E1.isDead)
+		if (powerUp.picked && powerUp.invincible)
 		{
-			if (CheckCollisionCircleRec(P1.center, 5, E1.enemy))
+
+		}
+		else
+		{
+			if (!E1.isDead)
 			{
-				P1.lives--;
-				P1.speed.x = 0;
-				P1.speed.y = 0;
-				P1.ship.x = static_cast<float>(GetScreenWidth() / 2);
-				P1.ship.y = static_cast<float>(GetScreenHeight() / 2);
-				E1.isDead = true;
+				if (CheckCollisionCircleRec(P1.center, 15, E1.enemy))
+				{
+					P1.lives--;
+					P1.speed.x = 0;
+					P1.speed.y = 0;
+					P1.ship.x = static_cast<float>(GetScreenWidth() / 2);
+					P1.ship.y = static_cast<float>(GetScreenHeight() / 2);
+					E1.isDead = true;
+				}
 			}
 		}
 	}
@@ -701,5 +802,9 @@ namespace EnemyF
 
 		E1.enemy.y = static_cast<float>(GetRandomValue(75, (GetScreenHeight() - (static_cast<int> (E1.enemy.height)))));
 	}
+}
+
+void LooseScreen(PLAYER& P1)
+{
 
 }

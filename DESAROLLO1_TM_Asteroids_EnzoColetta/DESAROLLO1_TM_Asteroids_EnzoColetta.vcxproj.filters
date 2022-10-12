@@ -27,6 +27,9 @@
     <ClCompile Include="..\src\object\enemy.cpp">
       <Filter>src\object</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\object\powerUp.cpp">
+      <Filter>src\object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\game.h">
@@ -42,6 +45,9 @@
       <Filter>src\object</Filter>
     </ClInclude>
     <ClInclude Include="..\src\object\enemy.h">
+      <Filter>src\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\object\powerUp.h">
       <Filter>src\object</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,10 +5,13 @@
 #include "object/player.h"
 #include "object/asteroid.h"
 #include "object/enemy.h"
+#include "object/powerUp.h"
 
 using namespace std;
 
 void Game(bool& closeGame, float& SFXvolume, float& MusicVolume);
+
+void LooseScreen(PLAYER& P1);
 
 namespace DrawF
 {
@@ -19,10 +22,10 @@ namespace DrawF
 		ASTEROID arrayAsteroid[],
 		int maxAsteroids,
 		bool pause,
-		float SFXvolume, 
+		float SFXvolume,
 		float MusicVolume,
-		ENEMY E1
-
+		ENEMY E1,
+		POWERUP powerUp
 	);
 
 	void DrawInfo(
@@ -41,26 +44,28 @@ namespace PlayerF
 	);
 
 	void BulletState(
-		BULLETS arrayBulets[], 
-		int maxAmmo, 
+		BULLETS arrayBulets[],
+		int maxAmmo,
 		PLAYER& P1
 	);
 
 	void PlayerShoot(
-		BULLETS arrayBulets[], 
-		int& counter, 
-		PLAYER& P1, 
-		int maxAmmo
+		BULLETS arrayBulets[],
+		int& counter,
+		PLAYER& P1,
+		int maxAmmo,
+		POWERUP powerUp
 	);
 
 	void PlayerAsteroidColision(
-		PLAYER& P1, 
+		PLAYER& P1,
 		ASTEROID arrayAsteroid[],
 		int amountAsteroidsBig,
 		int amountAsteroidsMedium,
 		int& counterMidAsteroid,
 		int& counterSmallAsteroid,
-		int maxAsteroids
+		int maxAsteroids,
+		POWERUP powerUp
 	);
 
 	void BulletAsteroidColition(
@@ -101,24 +106,34 @@ namespace AsteroidF
 namespace PauseF
 {
 	void PauseLogic(
-		float& SFXvolume, 
+		float& SFXvolume,
 		float& MusicVolume,
 		bool& closeGame
 	);
 
 	void DrawPause(
-		float SFXvolume, 
+		float SFXvolume,
 		float MusicVolume
 	);
 }
 
 namespace PowerUpF
 {
-
+	void PowerUpPlayerColision(
+		POWERUP& powerUp,
+		PLAYER& P1
+	);
 }
 
 namespace EnemyF
 {
+	void EnemyTimer(
+		ENEMY& E1,
+		float& timer,
+		float& maxTimer
+	);
+
+
 	void EnemyMovement(
 		ENEMY& E1
 	);
@@ -129,7 +144,8 @@ namespace EnemyF
 
 	void EnemyPlayerColition(
 		ENEMY& E1,
-		PLAYER& P1
+		PLAYER& P1,
+		POWERUP powerUp
 	);
 
 	void EnemyBulletColition(
