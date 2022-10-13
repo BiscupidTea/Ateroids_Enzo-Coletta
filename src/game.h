@@ -9,9 +9,13 @@
 
 using namespace std;
 
-void Game(bool& closeGame, float& SFXvolume, float& MusicVolume);
+void Game(
+	bool& closeGame, 
+	float& masterVolume,
+	int& maxScore
+);
 
-void LooseScreen(PLAYER& P1);
+void LooseScreen(PLAYER& P1, int maxScore);
 
 namespace DrawF
 {
@@ -22,10 +26,10 @@ namespace DrawF
 		ASTEROID arrayAsteroid[],
 		int maxAsteroids,
 		bool pause,
-		float SFXvolume,
-		float MusicVolume,
+		float masterVolume,
 		ENEMY E1,
-		POWERUP powerUp
+		POWERUP powerUp,
+		bool moving
 	);
 
 	void DrawInfo(
@@ -36,7 +40,8 @@ namespace DrawF
 namespace PlayerF
 {
 	void PlayerMovement(
-		PLAYER& P1
+		PLAYER& P1,
+		bool& moving
 	);
 
 	void PlayerWallColition(
@@ -106,14 +111,14 @@ namespace AsteroidF
 namespace PauseF
 {
 	void PauseLogic(
-		float& SFXvolume,
-		float& MusicVolume,
+		float& masterVolume,
+		bool& quit,
+		bool& pause,
 		bool& closeGame
 	);
 
 	void DrawPause(
-		float SFXvolume,
-		float MusicVolume
+		float masterVolume
 	);
 }
 

@@ -4,7 +4,6 @@
 struct POWERUP
 {
 	Vector2 center;
-	int id;
 	bool shot3r;
 	bool invincible;
 	bool isActive;

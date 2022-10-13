@@ -15,11 +15,22 @@ struct ASTEROID
 	Vector2 center;
 	Vector2 speed;
 	float radius;
-	int rotation;
+	float rotation;
 	bool isDestroyed;
 
 };
 
-void CreateAsteroidsBig(ASTEROID& asteroid);
-void CreateAsteroidsMedium(ASTEROID& asteroid);
-void CreateAsteroidsSmall(ASTEROID& asteroid);
+void CreateAsteroidsBig(
+	ASTEROID& asteroid,
+	Texture2D asteroidB
+);
+
+void CreateAsteroidsMedium(
+	ASTEROID& asteroid,
+	Texture2D asteroidM
+);
+
+void CreateAsteroidsSmall(
+	ASTEROID& asteroid,
+	Texture2D asteroidS
+);

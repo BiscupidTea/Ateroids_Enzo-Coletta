@@ -1,11 +1,11 @@
 #include "asteroid.h"
 
-void CreateAsteroidsBig(ASTEROID& asteroid)
+void CreateAsteroidsBig(ASTEROID& asteroid, Texture2D asteroidB)
 {
 	asteroid.size = Size::Big;
-	asteroid.rotation = GetRandomValue(0, 359);
+	asteroid.rotation = static_cast<float>(GetRandomValue(0, 359));
 	//asignar el radio
-	asteroid.radius = 50;
+	asteroid.radius = static_cast<float>(asteroidB.width/2);
 
 	//asignar donde salen
 	if (GetRandomValue(1, 2) == 1)
@@ -49,18 +49,17 @@ void CreateAsteroidsBig(ASTEROID& asteroid)
 	asteroid.isDestroyed = false;
 }
 
-void CreateAsteroidsMedium(ASTEROID& asteroid)
+void CreateAsteroidsMedium(ASTEROID& asteroid, Texture2D asteroidM)
 {
 	asteroid.size = Size::Medium;
-	asteroid.rotation = GetRandomValue(0, 359);
+	asteroid.rotation = static_cast<float>(GetRandomValue(0, 359));
 	//asignar el radio
-	asteroid.radius = 15;
+	asteroid.radius = static_cast<float>(asteroidM.width/2);
 
 	//asignar donde salen
 	asteroid.center.x = - 50;
 	asteroid.center.y = - 50;
 	
-
 	//asignar velocidad
 	asteroid.speed.x = 0;
 	asteroid.speed.y = 0;
@@ -68,12 +67,12 @@ void CreateAsteroidsMedium(ASTEROID& asteroid)
 	asteroid.isDestroyed = true;
 }
 
-void CreateAsteroidsSmall(ASTEROID& asteroid)
+void CreateAsteroidsSmall(ASTEROID& asteroid, Texture2D asteroidS)
 {	
 	asteroid.size = Size::Small;
-	asteroid.rotation = GetRandomValue(0, 359);
+	asteroid.rotation = static_cast<float>(GetRandomValue(0, 359));
 	//asignar el radio
-	asteroid.radius = 10;
+	asteroid.radius = static_cast<float>(asteroidS.width/2);
 
 	//asignar donde salen
 	asteroid.center.x = -50;

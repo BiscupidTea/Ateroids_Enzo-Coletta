@@ -9,13 +9,8 @@ POWERUP CreatePowerUp()
 
 	powerUp.center.x = static_cast<float>(GetRandomValue(0, GetScreenWidth()));
 	powerUp.center.y = static_cast<float>(GetRandomValue(0, GetScreenHeight()));
-	powerUp.radius = 10;
-	powerUp.timerC = 0;
-	powerUp.timerMaxC = 10;
-	powerUp.timerA = 0;
-	powerUp.timerMaxA = 10;
 
-	if (GetRandomValue(1,2) == 1)
+	if (GetRandomValue(1, 2) == 1)
 	{
 		powerUp.shot3r = true;
 		powerUp.invincible = false;
@@ -26,6 +21,11 @@ POWERUP CreatePowerUp()
 		powerUp.invincible = true;
 	}
 
+	powerUp.radius = 15;
+	powerUp.timerC = 0;
+	powerUp.timerMaxC = 10;
+	powerUp.timerA = 0;
+	powerUp.timerMaxA = 10;
 	powerUp.picked = false;
 	powerUp.isActive = false;
 

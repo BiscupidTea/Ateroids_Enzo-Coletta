@@ -34,4 +34,5 @@ void CreateBullets(BULLETS& bulet, PLAYER P1)
 	bulet.Pos.y = P1.center.y;
 	bulet.speed.x = 0;
 	bulet.speed.y = 0;
+	bulet.rotation = 0;
 }

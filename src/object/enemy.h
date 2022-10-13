@@ -11,5 +11,5 @@ struct ENEMY
 	bool isDead;
 };
 
-ENEMY CreateEnemy();
+ENEMY CreateEnemy(Texture2D enemyB);
 

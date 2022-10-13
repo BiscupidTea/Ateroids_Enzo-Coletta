@@ -132,7 +132,9 @@ MKDIR sounds
 MKDIR textures
 
 XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\textures"  "$(TargetDir)res\textures"
-)</Command>
+XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\sounds"  "$(TargetDir)res\sounds"
+)
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -189,7 +191,9 @@ MKDIR sounds
 MKDIR textures
 
 XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\textures"  "$(TargetDir)res\textures"
-)</Command>
+XCOPY "$(SolutionDir)DESAROLLO1_TM_Asteroids_EnzoColetta\res\sounds"  "$(TargetDir)res\sounds"
+)
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

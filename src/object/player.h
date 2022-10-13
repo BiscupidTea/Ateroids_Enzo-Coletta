@@ -13,7 +13,9 @@ struct PLAYER
 	Vector2 shipAcceleration;
 	Vector2 speed;
 	float radius;
-
+	int frameCounter = 0;
+	int framesSpeed = 3;
+	int currentFrame = 0;
 };
 
 struct BULLETS
